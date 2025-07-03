@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -304,6 +305,71 @@
         <div class="section-title">Análisis Visual</div>
         <canvas id="grafico1" height="260"></canvas>
       </div>
+      <!-- ANÁLISIS MATEMÁTICO CON PYTHON -->
+<div class="form-section">
+  <div class="section-title">Análisis Matemático con Python</div>
+  <p style="font-size:1.12rem; color:#232849;">
+    Este análisis permite identificar qué tramo del sistema tiene mayor influencia estructural mediante el cálculo de
+    <strong>valores propios</strong> y el <strong>vector propio dominante</strong> de la matriz de demanda.
+    Se utilizó <code>NumPy</code> para los cálculos, y <code>Matplotlib</code> para visualizar los resultados.
+  </p>
+
+  <pre style="background:#f9f9f9; padding:16px; border-radius:10px; font-size:0.95rem; border:1.5px solid #ccc; overflow:auto;">
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+# Matriz de demanda entre las paradas
+D = np.array([
+    [0,   95,   0,   0,   0,   0],
+    [0,    0, 120,   0,   0,   0],
+    [0,    0,   0, 145,   0,   0],
+    [0,    0,   0,   0, 180,   0],
+    [0,    0,   0,   0,   0, 160],
+    [0,    0, 220,   0,   0,   0]
+])
+
+# Cálculo de valores y vectores propios
+valores_propios, vectores_propios = np.linalg.eig(D)
+
+# Visualización de magnitudes
+plt.figure(figsize=(8, 5))
+sns.barplot(x=np.arange(len(valores_propios)), y=np.abs(valores_propios), palette="viridis")
+plt.title("Magnitud de los Valores Propios de la Matriz de Demanda")
+plt.xlabel("Índice")
+plt.ylabel("Valor Propio (|λ|)")
+plt.tight_layout()
+plt.savefig("valores_propios_demanda.png")
+
+# Exportar vector dominante
+valor_max = np.max(np.real(valores_propios))
+indice_max = np.argmax(np.real(valores_propios))
+vector_dominante = vectores_propios[:, indice_max].real.round(2)
+
+with open("vector_propio_dominante.txt", "w") as f:
+    f.write(f"Valor propio dominante: {valor_max:.2f}\n")
+    f.write("Vector propio asociado:\n")
+    paradas = ["Centro", "Colegio", "UNEMI", "Terminal", "Milagro Norte", "Vergeles"]
+    for i, val in enumerate(vector_dominante):
+        f.write(f"{paradas[i]}: {val}\n")
+  </pre>
+
+  <p style="font-size:1.05rem; margin-top:14px;">
+    Resultado principal: El valor propio dominante es aproximadamente <strong><span id="valorDominante">481.5</span></strong>,
+    indicando el tramo más crítico del sistema en términos de carga estructural.
+  </p>
+
+  <div class="mt-3">
+    <a href="valores_propios_demanda.png" download class="btn btn-custom" style="margin-right: 12px;">
+      Descargar Gráfico
+    </a>
+    <a href="vector_propio_dominante.txt" download class="btn btn-custom">
+      Descargar Vector Dominante
+    </a>
+  </div>
+</div>
+
     </div>
   </div>
   <!-- LIBRERÍAS -->
@@ -311,6 +377,9 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
+    // Puedes cambiar este valor si tienes uno diferente
+document.getElementById("valorDominante").innerText = "174.10";
+
     // --- SPLASH DE ENTRADA ---
     window.addEventListener('DOMContentLoaded',()=>{
       const splash = document.getElementById('splash-bg');
